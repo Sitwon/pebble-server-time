@@ -13,9 +13,9 @@
     "targetPlatforms": ["emery"],
     "watchapp": { "watchface": true },
     "resources": { "media": [
-      { "type": "font", "name": "FONT_TERMINAL_42", "file": "fonts/VT323-Regular.ttf", "characterRegex": "[:0-9]" },
-      { "type": "font", "name": "FONT_TERMINAL_32", "file": "fonts/VT323-Regular.ttf", "characterRegex": "[:0-9]" },
-      { "type": "font", "name": "FONT_TERMINAL_26", "file": "fonts/VT323-Regular.ttf", "characterRegex": "[:0-9]" }
+      { "type": "font", "name": "FONT_TERM_36", "file": "fonts/TerminusTTF-Regular.ttf", "characterRegex": "[:0-9]" },
+      { "type": "font", "name": "FONT_TERM_36_BOLD", "file": "fonts/TerminusTTF-Bold.ttf", "characterRegex": "[:0-9]" },
+      { "type": "font", "name": "FONT_TERM_18", "file": "fonts/TerminusTTF-Regular.ttf", "characterRegex": "[:0-9]" }
     ] }
   }
 }

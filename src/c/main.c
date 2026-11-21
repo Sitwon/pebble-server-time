@@ -72,10 +72,10 @@ static void window_load(Window *window) {
   GRect bounds = layer_get_bounds(root);
   int w = bounds.size.w;
 
-  // VT323: true monospace, so digits never shift as they tick
-  s_font_local = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_TERMINAL_42));
-  s_font_epoch = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_TERMINAL_32));
-  s_font_utc = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_TERMINAL_26));
+  // Terminus: true monospace, so digits never shift as they tick
+  s_font_local = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_TERM_36));
+  s_font_epoch = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_TERM_36_BOLD));
+  s_font_utc = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_TERM_18));
 
   s_local_time = text_layer_new(GRect(0, LOCAL_TIME_Y, w, 48),
                                 s_font_local, GColorWhite);
@@ -86,7 +86,7 @@ static void window_load(Window *window) {
                                  fonts_get_system_font(FONT_KEY_GOTHIC_14),
                                  GColorDarkGray);
   text_layer_set_text(s_epoch_label, "UNIX TIME");
-  s_epoch = text_layer_new(GRect(0, EPOCH_Y, w, 36),
+  s_epoch = text_layer_new(GRect(0, EPOCH_Y, w, 40),
                            s_font_epoch, GColorBrightGreen);
   s_utc_label = text_layer_new(GRect(0, UTC_LABEL_Y, w, 16),
                                fonts_get_system_font(FONT_KEY_GOTHIC_14),
