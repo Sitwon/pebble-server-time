@@ -6,8 +6,8 @@
 // the circle (usable width = 2*sqrt(130^2 - dy^2) must cover each string).
 #define LOCAL_TIME_Y   16  // Terminus 36, h 48
 #define LOCAL_DATE_Y  66   // Terminus 18, h 22
-#define EPOCH_LABEL_Y 92   // Terminus 14, h 16
-#define EPOCH_Y       108  // Terminus 36 bold, h 40
+#define EPOCH_LABEL_Y 104  // Terminus 14, h 16
+#define EPOCH_Y       120  // Terminus 36 bold, h 40
 #define UTC_LABEL_Y   176  // Terminus 14, h 16
 #define UTC_TIME_Y    192  // Terminus 18, h 28
 #define UTC_DATE_Y    220  // Terminus 18, h 18
