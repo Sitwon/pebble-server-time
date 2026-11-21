@@ -1,18 +1,26 @@
 #include <pebble.h>
 
 // Layout for emery (200x228). Bottom-most text ends at y=214, 14px margin.
-#define LOCAL_TIME_Y   2   // Bitham 42 Bold, h 48
-#define LOCAL_DATE_Y  50   // Gothic 18 Bold, h 22
-#define EPOCH_LABEL_Y 88   // Gothic 14, h 16
-#define EPOCH_Y       104  // Gothic 28 Bold, h 34
-#define UTC_LABEL_Y   152  // Gothic 14, h 16
-#define UTC_TIME_Y    168  // Gothic 24 Bold, h 28
-#define UTC_DATE_Y    196  // Gothic 14, h 18
+#define LOCAL_TIME_Y   2   // Terminus 36, h 48
+#define LOCAL_DATE_Y  50   // Terminus 18, h 22
+#define EPOCH_LABEL_Y 88   // Terminus 14, h 16
+#define EPOCH_Y       104  // Terminus 36 bold, h 40
+#define UTC_LABEL_Y   152  // Terminus 14, h 16
+#define UTC_TIME_Y    168  // Terminus 18, h 28
+#define UTC_DATE_Y    196  // Terminus 18, h 18
 
 static Window *s_window;
-static TextLayer *s_local_time, *s_local_date;
-static TextLayer *s_epoch_label, *s_epoch;
-static TextLayer *s_utc_label, *s_utc_time, *s_utc_date;
+static TextLayer *s_local_date, *s_epoch_label, *s_utc_label, *s_utc_date;
+
+// The three "hot" lines use custom layers so we can paint a phosphor glow.
+typedef struct {
+  char *text;
+  GFont font;
+  GSize size;
+} GlowLine;
+
+static Layer *s_local_time, *s_epoch, *s_utc_time;
+static GlowLine s_local_time_line, s_epoch_line, s_utc_time_line;
 
 static char s_local_time_buf[12], s_local_date_buf[16];
 static char s_epoch_buf[16];
@@ -46,15 +54,41 @@ static void update_time(void) {
   strftime(s_utc_time_buf, sizeof(s_utc_time_buf), "%H:%M:%S", utc_tm);
   strftime(s_utc_date_buf, sizeof(s_utc_date_buf), "%Y-%m-%d", utc_tm);
 
-  text_layer_set_text(s_local_time, s_local_time_buf);
+  layer_mark_dirty(s_local_time);
   text_layer_set_text(s_local_date, s_local_date_buf);
-  text_layer_set_text(s_epoch, s_epoch_buf);
-  text_layer_set_text(s_utc_time, s_utc_time_buf);
+  layer_mark_dirty(s_epoch);
+  layer_mark_dirty(s_utc_time);
   text_layer_set_text(s_utc_date, s_utc_date_buf);
 }
 
 static void tick_handler(struct tm *tick_time, TimeUnits changed) {
   update_time();
+}
+
+static void draw_text_at(GContext *ctx, const GlowLine *line,
+                         int dx, int dy, GColor color) {
+  graphics_context_set_text_color(ctx, color);
+  graphics_draw_text(ctx, line->text, line->font,
+                     GRect(dx, dy, line->size.w, line->size.h),
+                     GTextOverflowModeTrailingEllipsis,
+                     GTextAlignmentCenter, NULL);
+}
+
+// CRT bloom: dim halo, brighter inner ring, crisp text on top.
+static void glow_update_proc(Layer *layer, GContext *ctx) {
+  const GlowLine *line = layer_get_data(layer);
+  static const int outer[8][2] = {
+    {-1, -1}, {0, -1}, {1, -1}, {-1, 0}, {1, 0}, {-1, 1}, {0, 1}, {1, 1}
+  };
+  static const int inner[4][2] = { {0, -1}, {-1, 0}, {1, 0}, {0, 1} };
+
+  for (int i = 0; i < 8; i++) {
+    draw_text_at(ctx, line, outer[i][0], outer[i][1], GColorDarkGreen);
+  }
+  for (int i = 0; i < 4; i++) {
+    draw_text_at(ctx, line, inner[i][0], inner[i][1], GColorIslamicGreen);
+  }
+  draw_text_at(ctx, line, 0, 0, GColorGreen);
 }
 
 static TextLayer *text_layer_new(GRect frame, GFont font, GColor color) {
@@ -64,6 +98,17 @@ static TextLayer *text_layer_new(GRect frame, GFont font, GColor color) {
   text_layer_set_font(layer, font);
   text_layer_set_text_alignment(layer, GTextAlignmentCenter);
   layer_add_child(window_get_root_layer(s_window), text_layer_get_layer(layer));
+  return layer;
+}
+
+static Layer *glow_layer_new(const GlowLine *src, GRect frame, GFont font) {
+  Layer *layer = layer_create_with_data(frame, sizeof(GlowLine));
+  GlowLine *line = layer_get_data(layer);
+  *line = *src;
+  line->font = font;
+  line->size = frame.size;
+  layer_set_update_proc(layer, glow_update_proc);
+  layer_add_child(window_get_root_layer(s_window), layer);
   return layer;
 }
 
@@ -79,20 +124,23 @@ static void window_load(Window *window) {
   s_font_date = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_TERM_18));
   s_font_label = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_TERM_14));
 
-  s_local_time = text_layer_new(GRect(0, LOCAL_TIME_Y, w, 48),
-                                s_font_local, GColorGreen);
+  s_local_time_line.text = s_local_time_buf;
+  s_local_time = glow_layer_new(&s_local_time_line,
+                                GRect(0, LOCAL_TIME_Y, w, 48), s_font_local);
   s_local_date = text_layer_new(GRect(0, LOCAL_DATE_Y, w, 22),
                                 s_font_date, GColorIslamicGreen);
   s_epoch_label = text_layer_new(GRect(0, EPOCH_LABEL_Y, w, 16),
                                  s_font_label, GColorIslamicGreen);
   text_layer_set_text(s_epoch_label, "UNIX TIME");
-  s_epoch = text_layer_new(GRect(0, EPOCH_Y, w, 40),
-                           s_font_epoch, GColorGreen);
+  s_epoch_line.text = s_epoch_buf;
+  s_epoch = glow_layer_new(&s_epoch_line,
+                           GRect(0, EPOCH_Y, w, 40), s_font_epoch);
   s_utc_label = text_layer_new(GRect(0, UTC_LABEL_Y, w, 16),
                                s_font_label, GColorIslamicGreen);
   text_layer_set_text(s_utc_label, "UTC");
-  s_utc_time = text_layer_new(GRect(0, UTC_TIME_Y, w, 28),
-                              s_font_utc, GColorGreen);
+  s_utc_time_line.text = s_utc_time_buf;
+  s_utc_time = glow_layer_new(&s_utc_time_line,
+                              GRect(0, UTC_TIME_Y, w, 28), s_font_utc);
   s_utc_date = text_layer_new(GRect(0, UTC_DATE_Y, w, 18),
                               s_font_date, GColorIslamicGreen);
 
@@ -100,12 +148,12 @@ static void window_load(Window *window) {
 }
 
 static void window_unload(Window *window) {
-  text_layer_destroy(s_local_time);
+  layer_destroy(s_local_time);
+  layer_destroy(s_epoch);
+  layer_destroy(s_utc_time);
   text_layer_destroy(s_local_date);
   text_layer_destroy(s_epoch_label);
-  text_layer_destroy(s_epoch);
   text_layer_destroy(s_utc_label);
-  text_layer_destroy(s_utc_time);
   text_layer_destroy(s_utc_date);
   fonts_unload_custom_font(s_font_local);
   fonts_unload_custom_font(s_font_epoch);
