@@ -18,6 +18,8 @@ static char s_local_time_buf[12], s_local_date_buf[16];
 static char s_epoch_buf[16];
 static char s_utc_time_buf[12], s_utc_date_buf[16];
 
+static GFont s_font_local, s_font_epoch, s_font_utc;
+
 // Strip the leading zero "12h" strftime gives ("01:23" -> "1:23").
 static void strip_hour_zero(char *buf) {
   if (buf[0] == '0') {
@@ -33,7 +35,10 @@ static void update_time(void) {
 
   strftime(s_local_time_buf, sizeof(s_local_time_buf),
            clock_is_24h_style() ? "%H:%M:%S" : "%I:%M:%S", local_tm);
-  strip_hour_zero(s_local_time_buf);
+  // 24h "00:03" is correct; only 12h strftime needs the leading zero removed
+  if (!clock_is_24h_style()) {
+    strip_hour_zero(s_local_time_buf);
+  }
   strftime(s_local_date_buf, sizeof(s_local_date_buf), "%Y-%m-%d", local_tm);
 
   snprintf(s_epoch_buf, sizeof(s_epoch_buf), "%ld", (long)now);
@@ -52,12 +57,11 @@ static void tick_handler(struct tm *tick_time, TimeUnits changed) {
   update_time();
 }
 
-static TextLayer *text_layer_new(GRect frame, const char *font_key,
-                                 GColor color) {
+static TextLayer *text_layer_new(GRect frame, GFont font, GColor color) {
   TextLayer *layer = text_layer_create(frame);
   text_layer_set_background_color(layer, GColorClear);
   text_layer_set_text_color(layer, color);
-  text_layer_set_font(layer, fonts_get_system_font(font_key));
+  text_layer_set_font(layer, font);
   text_layer_set_text_alignment(layer, GTextAlignmentCenter);
   layer_add_child(window_get_root_layer(s_window), text_layer_get_layer(layer));
   return layer;
@@ -68,22 +72,31 @@ static void window_load(Window *window) {
   GRect bounds = layer_get_bounds(root);
   int w = bounds.size.w;
 
+  // VT323: true monospace, so digits never shift as they tick
+  s_font_local = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_TERMINAL_42));
+  s_font_epoch = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_TERMINAL_32));
+  s_font_utc = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_TERMINAL_26));
+
   s_local_time = text_layer_new(GRect(0, LOCAL_TIME_Y, w, 48),
-                                FONT_KEY_LECO_42_NUMBERS, GColorWhite);
+                                s_font_local, GColorWhite);
   s_local_date = text_layer_new(GRect(0, LOCAL_DATE_Y, w, 22),
-                                FONT_KEY_GOTHIC_18_BOLD, GColorLightGray);
+                                fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD),
+                                GColorLightGray);
   s_epoch_label = text_layer_new(GRect(0, EPOCH_LABEL_Y, w, 16),
-                                 FONT_KEY_GOTHIC_14, GColorDarkGray);
+                                 fonts_get_system_font(FONT_KEY_GOTHIC_14),
+                                 GColorDarkGray);
   text_layer_set_text(s_epoch_label, "UNIX TIME");
   s_epoch = text_layer_new(GRect(0, EPOCH_Y, w, 36),
-                           FONT_KEY_LECO_32_BOLD_NUMBERS, GColorBrightGreen);
+                           s_font_epoch, GColorBrightGreen);
   s_utc_label = text_layer_new(GRect(0, UTC_LABEL_Y, w, 16),
-                               FONT_KEY_GOTHIC_14, GColorDarkGray);
+                               fonts_get_system_font(FONT_KEY_GOTHIC_14),
+                               GColorDarkGray);
   text_layer_set_text(s_utc_label, "UTC");
-  s_utc_time = text_layer_new(GRect(0, UTC_TIME_Y, w, 30),
-                              FONT_KEY_LECO_26_BOLD_NUMBERS_AM_PM, GColorWhite);
+  s_utc_time = text_layer_new(GRect(0, UTC_TIME_Y, w, 28),
+                              s_font_utc, GColorWhite);
   s_utc_date = text_layer_new(GRect(0, UTC_DATE_Y, w, 18),
-                              FONT_KEY_GOTHIC_14, GColorLightGray);
+                              fonts_get_system_font(FONT_KEY_GOTHIC_14),
+                              GColorLightGray);
 
   update_time();
 }
@@ -96,6 +109,9 @@ static void window_unload(Window *window) {
   text_layer_destroy(s_utc_label);
   text_layer_destroy(s_utc_time);
   text_layer_destroy(s_utc_date);
+  fonts_unload_custom_font(s_font_local);
+  fonts_unload_custom_font(s_font_epoch);
+  fonts_unload_custom_font(s_font_utc);
 }
 
 static void init(void) {

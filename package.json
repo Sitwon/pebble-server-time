@@ -12,6 +12,10 @@
     "enableMultiJS": true,
     "targetPlatforms": ["emery"],
     "watchapp": { "watchface": true },
-    "resources": { "media": [] }
+    "resources": { "media": [
+      { "type": "font", "name": "FONT_TERMINAL_42", "file": "fonts/VT323-Regular.ttf", "characterRegex": "[:0-9]" },
+      { "type": "font", "name": "FONT_TERMINAL_32", "file": "fonts/VT323-Regular.ttf", "characterRegex": "[:0-9]" },
+      { "type": "font", "name": "FONT_TERMINAL_26", "file": "fonts/VT323-Regular.ttf", "characterRegex": "[:0-9]" }
+    ] }
   }
 }
