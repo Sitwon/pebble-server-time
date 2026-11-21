@@ -18,7 +18,7 @@ static char s_local_time_buf[12], s_local_date_buf[16];
 static char s_epoch_buf[16];
 static char s_utc_time_buf[12], s_utc_date_buf[16];
 
-static GFont s_font_local, s_font_epoch, s_font_utc;
+static GFont s_font_local, s_font_epoch, s_font_utc, s_font_date, s_font_label;
 
 // Strip the leading zero "12h" strftime gives ("01:23" -> "1:23").
 static void strip_hour_zero(char *buf) {
@@ -76,27 +76,25 @@ static void window_load(Window *window) {
   s_font_local = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_TERM_36));
   s_font_epoch = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_TERM_36_BOLD));
   s_font_utc = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_TERM_18));
+  s_font_date = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_TERM_18));
+  s_font_label = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_TERM_14));
 
   s_local_time = text_layer_new(GRect(0, LOCAL_TIME_Y, w, 48),
                                 s_font_local, GColorWhite);
   s_local_date = text_layer_new(GRect(0, LOCAL_DATE_Y, w, 22),
-                                fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD),
-                                GColorLightGray);
+                                s_font_date, GColorLightGray);
   s_epoch_label = text_layer_new(GRect(0, EPOCH_LABEL_Y, w, 16),
-                                 fonts_get_system_font(FONT_KEY_GOTHIC_14),
-                                 GColorDarkGray);
+                                 s_font_label, GColorDarkGray);
   text_layer_set_text(s_epoch_label, "UNIX TIME");
   s_epoch = text_layer_new(GRect(0, EPOCH_Y, w, 40),
                            s_font_epoch, GColorBrightGreen);
   s_utc_label = text_layer_new(GRect(0, UTC_LABEL_Y, w, 16),
-                               fonts_get_system_font(FONT_KEY_GOTHIC_14),
-                               GColorDarkGray);
+                               s_font_label, GColorDarkGray);
   text_layer_set_text(s_utc_label, "UTC");
   s_utc_time = text_layer_new(GRect(0, UTC_TIME_Y, w, 28),
                               s_font_utc, GColorWhite);
   s_utc_date = text_layer_new(GRect(0, UTC_DATE_Y, w, 18),
-                              fonts_get_system_font(FONT_KEY_GOTHIC_14),
-                              GColorLightGray);
+                              s_font_date, GColorLightGray);
 
   update_time();
 }
@@ -112,6 +110,8 @@ static void window_unload(Window *window) {
   fonts_unload_custom_font(s_font_local);
   fonts_unload_custom_font(s_font_epoch);
   fonts_unload_custom_font(s_font_utc);
+  fonts_unload_custom_font(s_font_date);
+  fonts_unload_custom_font(s_font_label);
 }
 
 static void init(void) {
