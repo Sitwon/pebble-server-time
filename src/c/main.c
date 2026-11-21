@@ -74,19 +74,19 @@ static void draw_text_at(GContext *ctx, const GlowLine *line,
                      GTextAlignmentCenter, NULL);
 }
 
-// CRT bloom: dim halo, brighter inner ring, crisp text on top.
+// CRT bloom: two dim rings around the crisp text give a soft 2px falloff.
 static void glow_update_proc(Layer *layer, GContext *ctx) {
   const GlowLine *line = layer_get_data(layer);
-  static const int outer[8][2] = {
-    {-1, -1}, {0, -1}, {1, -1}, {-1, 0}, {1, 0}, {-1, 1}, {0, 1}, {1, 1}
-  };
-  static const int inner[4][2] = { {0, -1}, {-1, 0}, {1, 0}, {0, 1} };
 
-  for (int i = 0; i < 8; i++) {
-    draw_text_at(ctx, line, outer[i][0], outer[i][1], GColorDarkGreen);
-  }
-  for (int i = 0; i < 4; i++) {
-    draw_text_at(ctx, line, inner[i][0], inner[i][1], GColorIslamicGreen);
+  for (int dy = -2; dy <= 2; dy++) {
+    for (int dx = -2; dx <= 2; dx++) {
+      if (dx == 0 && dy == 0) {
+        continue; // core drawn last
+      }
+      int d = (abs(dx) > abs(dy) ? abs(dx) : abs(dy)); // chebyshev distance
+      draw_text_at(ctx, line, dx, dy,
+                   d == 1 ? GColorIslamicGreen : GColorDarkGreen);
+    }
   }
   draw_text_at(ctx, line, 0, 0, GColorGreen);
 }
