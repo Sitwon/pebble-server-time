@@ -74,19 +74,13 @@ static void draw_text_at(GContext *ctx, const GlowLine *line,
                      GTextAlignmentCenter, NULL);
 }
 
-// CRT bloom: dim halo, brighter inner ring, crisp text on top.
+// CRT bloom: dark corner bloom only, strokes stay sharp.
 static void glow_update_proc(Layer *layer, GContext *ctx) {
   const GlowLine *line = layer_get_data(layer);
-  static const int outer[8][2] = {
-    {-1, -1}, {0, -1}, {1, -1}, {-1, 0}, {1, 0}, {-1, 1}, {0, 1}, {1, 1}
-  };
-  static const int inner[4][2] = { {0, -1}, {-1, 0}, {1, 0}, {0, 1} };
+  static const int diag[4][2] = { {-1, -1}, {1, -1}, {-1, 1}, {1, 1} };
 
-  for (int i = 0; i < 8; i++) {
-    draw_text_at(ctx, line, outer[i][0], outer[i][1], GColorDarkGreen);
-  }
   for (int i = 0; i < 4; i++) {
-    draw_text_at(ctx, line, inner[i][0], inner[i][1], GColorIslamicGreen);
+    draw_text_at(ctx, line, diag[i][0], diag[i][1], GColorDarkGreen);
   }
   draw_text_at(ctx, line, 0, 0, GColorGreen);
 }
