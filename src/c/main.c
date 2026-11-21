@@ -123,6 +123,9 @@ static void init(void) {
   });
   window_stack_push(s_window, true);
 
+  // Green phosphor backlight while the face is foregrounded (auto-restored on exit)
+  light_set_color_rgb888(0x0000FF00);
+
   tick_timer_service_subscribe(SECOND_UNIT, tick_handler);
 }
 
