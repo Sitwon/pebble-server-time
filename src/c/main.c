@@ -69,19 +69,19 @@ static void window_load(Window *window) {
   int w = bounds.size.w;
 
   s_local_time = text_layer_new(GRect(0, LOCAL_TIME_Y, w, 48),
-                                FONT_KEY_BITHAM_42_BOLD, GColorWhite);
+                                FONT_KEY_LECO_42_NUMBERS, GColorWhite);
   s_local_date = text_layer_new(GRect(0, LOCAL_DATE_Y, w, 22),
                                 FONT_KEY_GOTHIC_18_BOLD, GColorLightGray);
   s_epoch_label = text_layer_new(GRect(0, EPOCH_LABEL_Y, w, 16),
                                  FONT_KEY_GOTHIC_14, GColorDarkGray);
   text_layer_set_text(s_epoch_label, "UNIX TIME");
-  s_epoch = text_layer_new(GRect(0, EPOCH_Y, w, 34),
-                           FONT_KEY_GOTHIC_28_BOLD, GColorBrightGreen);
+  s_epoch = text_layer_new(GRect(0, EPOCH_Y, w, 36),
+                           FONT_KEY_LECO_32_BOLD_NUMBERS, GColorBrightGreen);
   s_utc_label = text_layer_new(GRect(0, UTC_LABEL_Y, w, 16),
                                FONT_KEY_GOTHIC_14, GColorDarkGray);
   text_layer_set_text(s_utc_label, "UTC");
-  s_utc_time = text_layer_new(GRect(0, UTC_TIME_Y, w, 28),
-                              FONT_KEY_GOTHIC_24_BOLD, GColorWhite);
+  s_utc_time = text_layer_new(GRect(0, UTC_TIME_Y, w, 30),
+                              FONT_KEY_LECO_26_BOLD_NUMBERS_AM_PM, GColorWhite);
   s_utc_date = text_layer_new(GRect(0, UTC_DATE_Y, w, 18),
                               FONT_KEY_GOTHIC_14, GColorLightGray);
 
