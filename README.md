@@ -1,11 +1,12 @@
 # Server Time
 
-A phosphor-terminal watchface for the Pebble Time 2 (emery platform). Local
-time and date up top, a live Unix epoch counter in the middle, and UTC time
-and date at the bottom — all in Terminus on a black screen, like a good
-green-phosphor terminal.
+A phosphor-terminal watchface for the Pebble Time 2 (emery) and Pebble Round 2
+(gabbro). Local time and date up top, a live Unix epoch counter in the middle,
+and UTC time and date at the bottom — all in Terminus on a black screen, like
+a good green-phosphor terminal.
 
-![Server Time](screenshot_emery.png)
+![Server Time on emery](screenshot_emery.png)
+![Server Time on gabbro](screenshots/gabbro_spacing.png)
 
 ## Features
 
@@ -16,6 +17,8 @@ green-phosphor terminal.
   as they tick
 - Subtle CRT bloom on the bright text and a green-tinted backlight while
   the face is foregrounded
+- Platform-aware layout: the round (gabbro) build shifts the stack inward
+  so every line stays inside the circle
 
 ## Build and install
 
