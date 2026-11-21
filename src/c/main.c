@@ -14,9 +14,9 @@ static TextLayer *s_local_time, *s_local_date;
 static TextLayer *s_epoch_label, *s_epoch;
 static TextLayer *s_utc_label, *s_utc_time, *s_utc_date;
 
-static char s_local_time_buf[8], s_local_date_buf[16];
+static char s_local_time_buf[12], s_local_date_buf[16];
 static char s_epoch_buf[16];
-static char s_utc_time_buf[8], s_utc_date_buf[16];
+static char s_utc_time_buf[12], s_utc_date_buf[16];
 
 // Strip the leading zero "12h" strftime gives ("01:23" -> "1:23").
 static void strip_hour_zero(char *buf) {
@@ -32,14 +32,14 @@ static void update_time(void) {
   struct tm *utc_tm = gmtime(&now);
 
   strftime(s_local_time_buf, sizeof(s_local_time_buf),
-           clock_is_24h_style() ? "%H:%M" : "%I:%M", local_tm);
+           clock_is_24h_style() ? "%H:%M:%S" : "%I:%M:%S", local_tm);
   strip_hour_zero(s_local_time_buf);
-  strftime(s_local_date_buf, sizeof(s_local_date_buf), "%a, %b %e", local_tm);
+  strftime(s_local_date_buf, sizeof(s_local_date_buf), "%Y-%m-%d", local_tm);
 
   snprintf(s_epoch_buf, sizeof(s_epoch_buf), "%ld", (long)now);
 
-  strftime(s_utc_time_buf, sizeof(s_utc_time_buf), "%H:%M", utc_tm);
-  strftime(s_utc_date_buf, sizeof(s_utc_date_buf), "%a, %b %e", utc_tm);
+  strftime(s_utc_time_buf, sizeof(s_utc_time_buf), "%H:%M:%S", utc_tm);
+  strftime(s_utc_date_buf, sizeof(s_utc_date_buf), "%Y-%m-%d", utc_tm);
 
   text_layer_set_text(s_local_time, s_local_time_buf);
   text_layer_set_text(s_local_date, s_local_date_buf);
@@ -76,7 +76,7 @@ static void window_load(Window *window) {
                                  FONT_KEY_GOTHIC_14, GColorDarkGray);
   text_layer_set_text(s_epoch_label, "UNIX TIME");
   s_epoch = text_layer_new(GRect(0, EPOCH_Y, w, 34),
-                           FONT_KEY_GOTHIC_28_BOLD, GColorCyan);
+                           FONT_KEY_GOTHIC_28_BOLD, GColorBrightGreen);
   s_utc_label = text_layer_new(GRect(0, UTC_LABEL_Y, w, 16),
                                FONT_KEY_GOTHIC_14, GColorDarkGray);
   text_layer_set_text(s_utc_label, "UTC");
