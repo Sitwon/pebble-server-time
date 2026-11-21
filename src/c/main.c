@@ -1,6 +1,17 @@
 #include <pebble.h>
 
-// Layout for emery (200x228). Bottom-most text ends at y=214, 14px margin.
+// Emery: 200x228 rect. Bottom-most text ends at y=214, 14px margin.
+#ifdef PBL_ROUND
+// Gabbro: 260x260 round. The stack shifts inward so every line stays inside
+// the circle (usable width = 2*sqrt(130^2 - dy^2) must cover each string).
+#define LOCAL_TIME_Y   16  // Terminus 36, h 48
+#define LOCAL_DATE_Y  66   // Terminus 18, h 22
+#define EPOCH_LABEL_Y 92   // Terminus 14, h 16
+#define EPOCH_Y       108  // Terminus 36 bold, h 40
+#define UTC_LABEL_Y   176  // Terminus 14, h 16
+#define UTC_TIME_Y    192  // Terminus 18, h 28
+#define UTC_DATE_Y    220  // Terminus 18, h 18
+#else
 #define LOCAL_TIME_Y   2   // Terminus 36, h 48
 #define LOCAL_DATE_Y  50   // Terminus 18, h 22
 #define EPOCH_LABEL_Y 88   // Terminus 14, h 16
@@ -8,6 +19,7 @@
 #define UTC_LABEL_Y   152  // Terminus 14, h 16
 #define UTC_TIME_Y    168  // Terminus 18, h 28
 #define UTC_DATE_Y    196  // Terminus 18, h 18
+#endif
 
 static Window *s_window;
 static TextLayer *s_local_date, *s_epoch_label, *s_utc_label, *s_utc_date;
