@@ -80,21 +80,21 @@ static void window_load(Window *window) {
   s_font_label = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_TERM_14));
 
   s_local_time = text_layer_new(GRect(0, LOCAL_TIME_Y, w, 48),
-                                s_font_local, GColorWhite);
+                                s_font_local, GColorScreaminGreen);
   s_local_date = text_layer_new(GRect(0, LOCAL_DATE_Y, w, 22),
-                                s_font_date, GColorLightGray);
+                                s_font_date, GColorIslamicGreen);
   s_epoch_label = text_layer_new(GRect(0, EPOCH_LABEL_Y, w, 16),
-                                 s_font_label, GColorDarkGray);
+                                 s_font_label, GColorIslamicGreen);
   text_layer_set_text(s_epoch_label, "UNIX TIME");
   s_epoch = text_layer_new(GRect(0, EPOCH_Y, w, 40),
-                           s_font_epoch, GColorBrightGreen);
+                           s_font_epoch, GColorScreaminGreen);
   s_utc_label = text_layer_new(GRect(0, UTC_LABEL_Y, w, 16),
-                               s_font_label, GColorDarkGray);
+                               s_font_label, GColorIslamicGreen);
   text_layer_set_text(s_utc_label, "UTC");
   s_utc_time = text_layer_new(GRect(0, UTC_TIME_Y, w, 28),
-                              s_font_utc, GColorWhite);
+                              s_font_utc, GColorScreaminGreen);
   s_utc_date = text_layer_new(GRect(0, UTC_DATE_Y, w, 18),
-                              s_font_date, GColorLightGray);
+                              s_font_date, GColorIslamicGreen);
 
   update_time();
 }
