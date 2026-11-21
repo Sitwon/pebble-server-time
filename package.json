@@ -1,0 +1,17 @@
+{
+  "name": "pebble-server-time",
+  "author": "Adam",
+  "version": "1.0.0",
+  "keywords": ["pebble-app"],
+  "private": true,
+  "dependencies": {},
+  "pebble": {
+    "displayName": "Server Time",
+    "uuid": "843b504e-eafc-44f3-b4b7-09a7ec7650f6",
+    "sdkVersion": "3",
+    "enableMultiJS": true,
+    "targetPlatforms": ["emery"],
+    "watchapp": { "watchface": true },
+    "resources": { "media": [] }
+  }
+}
